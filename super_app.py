@@ -1,5 +1,4 @@
 import streamlit as st
-import chromadb
 import os
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
@@ -13,8 +12,6 @@ model = ChatAnthropic(
     api_key=os.getenv("ANTHROPIC_API_KEY")
 )
 
-chroma_client = chromadb.PersistentClient(path="./memory_db")
-collection = chroma_client.get_or_create_collection("chat_memory")
 search = DuckDuckGoSearchRun()
 
 st.title("Abdul's Super AI 🚀")
@@ -32,31 +29,14 @@ if prompt := st.chat_input("Ask me anything..."):
     with st.chat_message("user"):
         st.write(prompt)
 
-    # Search web if needed
     search_results = search.run(prompt)
 
-    # Get past memories
-    count = collection.count()
-    results = collection.query(
-        query_texts=[prompt],
-        n_results=min(3, max(1, count))
-    ) if count > 0 else {"documents": [[]]}
-    past = results["documents"][0]
-
-    # Get AI response
     response = model.invoke([
-        SystemMessage(f"You are Abdul's personal AI. Past context: {past}. Web results: {search_results}"),
+        SystemMessage(f"You are Abdul's personal AI assistant. Web search results: {search_results}"),
         HumanMessage(prompt)
     ])
 
     ai_reply = response.content
-
-    # Save to memory
-    collection.add(
-        documents=[f"User: {prompt} | AI: {ai_reply}"],
-        ids=[f"conv_{count}"]
-    )
-
     st.session_state.messages.append({"role": "assistant", "content": ai_reply})
     with st.chat_message("assistant"):
         st.write(ai_reply)
