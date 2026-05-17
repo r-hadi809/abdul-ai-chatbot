@@ -5,5 +5,6 @@ pypdf2
 langchain
 langchain-anthropic
 langchain-community
-chromadb
+chromadb==0.4.24
 ddgs
+opentelemetry-exporter-otlp-proto-grpc==1.20.0
