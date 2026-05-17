@@ -2,3 +2,8 @@ anthropic
 streamlit
 python-dotenv
 pypdf2
+langchain
+langchain-anthropic
+langchain-community
+chromadb
+ddgs
