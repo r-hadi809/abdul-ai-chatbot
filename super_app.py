@@ -1,21 +1,15 @@
 import streamlit as st
+import anthropic
 import os
 from dotenv import load_dotenv
-from langchain_anthropic import ChatAnthropic
-from langchain_community.tools import DuckDuckGoSearchRun
-from langchain_core.messages import HumanMessage, SystemMessage
+from duckduckgo_search import DDGS
 
 load_dotenv()
 
-model = ChatAnthropic(
-    model="claude-haiku-4-5-20251001",
-    api_key=os.getenv("ANTHROPIC_API_KEY")
-)
-
-search = DuckDuckGoSearchRun()
+client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 st.title("Abdul's Super AI 🚀")
-st.write("I can search the web AND remember our conversations!")
+st.write("I can search the web for you!")
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -29,14 +23,19 @@ if prompt := st.chat_input("Ask me anything..."):
     with st.chat_message("user"):
         st.write(prompt)
 
-    search_results = search.run(prompt)
+    # Search web
+    with DDGS() as ddgs:
+        results = list(ddgs.text(prompt, max_results=3))
+    search_text = " ".join([r["body"] for r in results])
 
-    response = model.invoke([
-        SystemMessage(f"You are Abdul's personal AI assistant. Web search results: {search_results}"),
-        HumanMessage(prompt)
-    ])
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=1024,
+        system=f"You are Abdul's personal AI assistant. Use these web results to help answer: {search_text}",
+        messages=st.session_state.messages
+    )
 
-    ai_reply = response.content
+    ai_reply = response.content[0].text
     st.session_state.messages.append({"role": "assistant", "content": ai_reply})
     with st.chat_message("assistant"):
         st.write(ai_reply)

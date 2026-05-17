@@ -107,13 +107,13 @@
 
 
 
-student = {"name": "Abdul Hadi", "age": 20, "grade": "A"}
-user=input("enter a key")
-for key in student.keys():
-    if key==user:
-        print(key.values())
-    else:
-        print("not found")
+# student = {"name": "Abdul Hadi", "age": 20, "grade": "A"}
+# user=input("enter a key")
+# for key in student.keys():
+#     if key==user:
+#         print(key.values())
+#     else:
+#         print("not found")
 
 
 # for keys,values in student.items():

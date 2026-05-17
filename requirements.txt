@@ -1,9 +1,5 @@
 anthropic
 streamlit
 python-dotenv
-pypdf2
-langchain
-langchain-anthropic
-langchain-community
 ddgs
-protobuf==3.20.3
+duckduckgo-search
